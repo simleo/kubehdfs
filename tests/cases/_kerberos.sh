@@ -53,7 +53,12 @@ function run_test_case () {
   k8s_single_pod_ready -l app=zookeeper,release=my-hdfs
   k8s_all_pods_ready 3 -l app=hdfs-journalnode,release=my-hdfs
   k8s_all_pods_ready 2 -l app=hdfs-namenode,release=my-hdfs
-  k8s_single_pod_ready -l app=hdfs-datanode,release=my-hdfs
+  k8s_single_pod_ready -l app=hdfs-datanode,release=my-hdfs || (
+      cid=$(kubectl get pod -o=jsonpath='{.items[0].status.containerStatuses[?(@.image=="crs4/securedatanode:3.2.0-ubuntu")].containerID}' -l app=hdfs-datanode,release=my-hdfs | cut -d / -f 3)
+      sudo rm -rf /tmp/logs && docker cp ${cid}:/opt/hadoop/logs /tmp/
+      tail -n 1000 /tmp/logs/*
+      exit 1
+  )
   k8s_single_pod_ready -l app=hdfs-client,release=my-hdfs
   _CLIENT=$(kubectl get pods -l app=hdfs-client,release=my-hdfs -o name |  \
       cut -d/ -f 2)
