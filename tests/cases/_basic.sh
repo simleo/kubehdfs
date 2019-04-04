@@ -27,6 +27,9 @@ function run_test_case () {
   echo All persistent volumes:
   kubectl get pv
 
+  echo All hostnames:
+  kubectl get pod --no-headers | awk '{print $1}' | while read p; do echo -en "${p}: "; kubectl exec ${p} hostname; done
+
   _run kubectl exec $_CLIENT -- hdfs dfsadmin -report
   _run kubectl exec $_CLIENT -- hdfs haadmin -getServiceState nn0
   _run kubectl exec $_CLIENT -- hdfs haadmin -getServiceState nn1
