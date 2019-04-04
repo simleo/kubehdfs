@@ -61,7 +61,14 @@ function run_test_case () {
   
   k8s_single_pod_ready -l app=hdfs-datanode,release=my-hdfs || (
       cid=$(kubectl get pod -o=jsonpath='{.items[0].status.containerStatuses[?(@.image=="crs4/securedatanode:3.2.0-ubuntu")].containerID}' -l app=hdfs-datanode,release=my-hdfs | cut -d / -f 3)
+      krb="my-hdfs-krb5-0"  # should get this with kubectl
+      ktab="/tmp/datanode.keytab"
+      docker cp ${cid}:/etc/security/hdfs.keytab ${ktab}
+      kubectl cp ${ktab} ${krb}:${ktab}
+      echo Dumping datanode keytab
+      kubectl exec ${krb} -- klist -e -k -t ${ktab}
       sudo rm -rf /tmp/logs && docker cp ${cid}:/opt/hadoop/logs /tmp/
+      echo Dumping datanode logs
       tail -n 1000 /tmp/logs/*
       exit 1
   )
