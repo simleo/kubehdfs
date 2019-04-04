@@ -94,6 +94,8 @@ spec:
               value: /dev/stdout
             - name: JSVC_ERRFILE
               value: /dev/stderr
+            - name: HADOOP_OPTS
+              value: "-Dsun.security.krb5.debug=true"
             {{- end }}
           livenessProbe:
             exec:
