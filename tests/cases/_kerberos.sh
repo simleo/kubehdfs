@@ -54,7 +54,8 @@ function run_test_case () {
   k8s_all_pods_ready 3 -l app=hdfs-journalnode,release=my-hdfs
   k8s_all_pods_ready 2 -l app=hdfs-namenode,release=my-hdfs
 
-  namenode=$(kubectl get pod -l app=hdfs-namenode,release=my-hdfs --no-headers | head -n 1 | awk '{print $1}')
+  # namenode=$(kubectl get pod -l app=hdfs-namenode,release=my-hdfs --no-headers | head -n 1 | awk '{print $1}')
+  namenode="my-hdfs-namenode-0"
   echo Listing /etc/security from ${namenode}
   kubectl exec ${namenode} -- ls -l /etc/security
   
